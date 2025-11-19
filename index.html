@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vibe Code Backpacker - 2D Edition</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.sh/@google/genai@0.14.0"
+      }
+    }
+    </script>
+    <style>
+        :root {
+            --bg-dark: #1a202c;
+            --bg-light: #2d3748;
+            --border-color: #4a5568;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --accent-color: #4fd1c5;
+            --accent-hover: #38b2ac;
+            --green-color: #48bb78;
+            --red-color: #f56565;
+            --green-dark: #2f855a;
+            --red-dark: #c53030;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        #map {
+            flex-grow: 1;
+            height: 100%;
+        }
+        .leaflet-container {
+            background: #0e121a;
+        }
+
+        #sidebar {
+            width: 450px;
+            min-width: 400px;
+            height: 100%;
+            background-color: var(--bg-dark);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #dashboard {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(45, 55, 72, 0.5);
+        }
+
+        .title {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .stat {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            gap: 1rem;
+        }
+
+        .stat > span:first-child {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        #location {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .money-value {
+            color: var(--green-color);
+            font-weight: bold;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--bg-light);
+            border-radius: 999px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background-color: var(--accent-color);
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            transition: width 0.3s ease-out;
+        }
+        .progress-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        #panel {
+            flex-grow: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .panel-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .quiz-question {
+            margin-bottom: 1.5rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .item-button, .action-button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: left;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-size: 1rem;
+        }
+
+        .item-button:hover:not(:disabled) {
+            background-color: #3c4a60;
+            border-color: var(--accent-hover);
+        }
+
+        .item-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .item-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .item-subtitle, .item-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .item-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-cost {
+            font-weight: bold;
+            color: var(--red-color);
+        }
+        
+        .quiz-option.correct { background-color: var(--green-dark); }
+        .quiz-option.incorrect { background-color: var(--red-dark); }
+        .quiz-option.disabled { opacity: 0.6; }
+        
+        .final-screen {
+            text-align: center;
+        }
+        .action-button {
+            background-color: var(--accent-color);
+            color: var(--bg-dark);
+            font-weight: bold;
+            text-align: center;
+        }
+        .action-button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #loading-overlay.hidden {
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--accent-color);
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        #loading-message {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        #mobile-unsupported-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 2000;
+            padding: 2rem;
+        }
+        .mobile-unsupported-message {
+            max-width: 400px;
+        }
+        .mobile-unsupported-message .title {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+        .mobile-unsupported-message p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        .mobile-unsupported-message p:last-of-type {
+            margin-top: 1.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        #beta-badge {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background-color: var(--accent-color);
+            color: var(--bg-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            z-index: 3000;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        #welcome-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+            padding: 2rem;
+        }
+
+        #welcome-overlay.hidden {
+            display: none;
+        }
+
+        .welcome-modal {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .welcome-modal .title {
+            margin-bottom: 1rem;
+        }
+
+        .welcome-modal .panel-description {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-modal .rules {
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-modal .rules h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .welcome-modal .rules ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .welcome-modal .rules ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .welcome-modal .rules ul li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .welcome-modal .beta-notice {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .welcome-modal .beta-notice strong {
+            color: var(--text-primary);
+        }
+
+        .welcome-modal .action-button {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .shimmer-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shimmer-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 4.5s forwards;
+            animation-iteration-count: 1;
+        }
+
+        @keyframes shimmer {
+            100% {
+                left: 100%;
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Media query for portrait orientation */
+        @media (orientation: portrait) {
+            #app-container, #loading-overlay, #welcome-overlay {
+                display: none;
+            }
+            #mobile-unsupported-overlay {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <div id="map"></div>
+        <div id="sidebar">
+            <div id="dashboard">
+                <h1 class="title">Vibe Code Backpacker</h1>
+                <div class="stat">
+                    <span>Money:</span>
+                    <span id="money" class="money-value">$0</span>
+                </div>
+                <div class="stat">
+                    <span>Location:</span>
+                    <span id="location">N/A</span>
+                </div>
+                <div class="stat">
+                    <span>Progress:</span>
+                    <div class="progress-container">
+                        <div class="progress-bar-container">
+                            <div id="progress-bar" class="progress-bar"></div>
+                        </div>
+                        <span id="progress-text" class="progress-text">0°/360°</span>
+                    </div>
+                </div>
+                 <div class="stat">
+                    <span>Status:</span>
+                    <span id="status">Initializing...</span>
+                </div>
+            </div>
+            <div id="panel">
+                <!-- Game content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner"></div>
+        <p id="loading-message"></p>
+    </div>
+    <div id="mobile-unsupported-overlay">
+        <div class="mobile-unsupported-message">
+            <h1 class="title">Vibe Code Backpacker</h1>
+            <p>This game is best experienced on a desktop browser with a landscape view.</p>
+            <p>Please switch to a wider screen to begin your journey!</p>
+        </div>
+    </div>
+    <div id="welcome-overlay">
+        <div class="welcome-modal">
+            <h1 class="title">Welcome to Vibe Code Backpacker!</h1>
+            <p class="panel-description">Your goal is to circumnavigate the globe and return home.</p>
+            <div class="rules">
+                <h3>How to Play:</h3>
+                <ul>
+                    <li>Answer quizzes about your location to earn money.</li>
+                    <li>Find jobs and pass job trials to earn more cash.</li>
+                    <li>Manage your budget to pay for flights, trains, and buses.</li>
+                    <li>Travel across 360° of longitude to complete your journey!</li>
+                </ul>
+            </div>
+            <div class="beta-notice">
+                <p><strong>Heads up!</strong> This is a beta version. Features may change and occasional bugs might appear.</p>
+            </div>
+            <button id="start-game-btn" class="action-button">Start My Journey</button>
+        </div>
+    </div>
+    <div id="beta-badge">Beta</div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
