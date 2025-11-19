@@ -118,7 +118,7 @@ class GeminiService {
     }
 
     generateQuiz(context, topic) {
-        const prompt = `Based on the provided text about "${topic}", generate 10 interesting, high-school level multiple choice questions. The questions should focus on significant facts such as history, geography, culture, or important landmarks. Avoid obscure trivia or pop culture references (like films or TV shows) unless they are of major historical or cultural significance. The "answer" field MUST exactly match one of the strings from the "options" array. Each question must have 4 options. Provided text: "${context}"`;
+        const prompt = `Based on the provided text about "${topic}", generate 10 interesting, high-school level multiple choice questions. The questions should focus on significant facts such as history, geography, culture, or important landmarks. Avoid obscure trivia or pop culture references (like films or TV shows) unless they are of major historical or cultural significance. The "answer" field MUST exactly match one of the strings from the "options" array. Each question must have 4 options. Crucially, the quiz taker will not see the provided text, so all questions must be self-contained and should not refer to the text in any way (e.g., do not use phrases like 'in the text' or 'as mentioned in the article'). Provided text: "${context}"`;
         return this.generate(prompt, { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { question: { type: Type.STRING }, options: { type: Type.ARRAY, items: { type: Type.STRING } }, answer: { type: Type.STRING } }, required: ["question", "options", "answer"] } });
     }
     
