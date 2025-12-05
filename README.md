@@ -1,17 +1,25 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<img alt="Preview" src="https://github.com/chorned/Vibe-Code-Backpacker/blob/main/.github/preview_LLM.png" />
 </div>
 
-# Run and deploy your AI Studio app
+# Welcome to Vibe Code Backpacker!
 
-This contains everything you need to run your app locally.
+Your goal is to circumnavigate the globe and return home.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1gTU5cW0rKduMn9SpC0uojBDt1Z3jYuD1
+**How to Play:**
+- Answer quizzes about your location to earn money.
+- Find jobs and pass job trials to earn more cash.
+- Manage your budget to pay for flights, trains, and buses.
+- Travel across 360° of longitude to complete your journey!
+- Heads up! This is a beta version. Features may change and occasional bugs might appear.
+
+built in Google AI Studio
+
+https://www.linkedin.com/in/carlhorned/
 
 ## Run Locally
 
 **Prerequisites:**  Node.js
-
 
 1. Install dependencies:
    `npm install`
