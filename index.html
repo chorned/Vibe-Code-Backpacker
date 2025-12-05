@@ -315,6 +315,7 @@
             align-items: center;
             z-index: 1500;
             padding: 2rem;
+            backdrop-filter: blur(4px);
         }
 
         #welcome-overlay.hidden {
@@ -389,7 +390,49 @@
             width: 100%;
             padding: 1rem;
             font-size: 1.1rem;
+            margin-bottom: 1.5rem;
         }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .social-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        .social-link-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-hover);
+            background-color: #3c4a60;
+        }
+        .social-link-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        
+        .social-link-btn.donate {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        .social-link-btn.donate:hover {
+             background-color: var(--accent-hover);
+             color: var(--bg-dark);
+             border-color: var(--accent-hover);
+        }
+
 
         .shimmer-effect {
             position: relative;
@@ -491,6 +534,24 @@
                 <p><strong>Heads up!</strong> This is a beta version. Features may change and occasional bugs might appear.</p>
             </div>
             <button id="start-game-btn" class="action-button">Start My Journey</button>
+            <div class="social-links">
+                <a href="https://horned.se" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="Portfolio">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path></svg>
+                    Portfolio
+                </a>
+                <a href="https://github.com/chorned" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="GitHub">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-1.02-.01-1.85-2.78.6-3.37-1.18-3.37-1.18-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.6 1.03 2.69 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.73 0 .27.18.58.69.48C19.13 20.17 22 16.42 22 12c0-5.52-4.48-10-10-10z"></path></svg>
+                    GitHub
+                </a>
+                <a href="https://www.linkedin.com/in/carlhorned/" target="_blank" rel="noopener noreferrer" class="social-link-btn" title="LinkedIn">
+                    <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zm-12 5v10h4V13c0-1.11.22-2.12 1.6-2.12 1.35 0 1.4 1.25 1.4 2.2V18h4v-5.5c0-2.84-1.52-4.12-3.53-4.12C12.41 8.38 11.5 9.11 11 9.8V8H7zm-2-2H9v3H5V6z"></path></svg>
+                    LinkedIn
+                </a>
+                 <a href="https://ko-fi.com/chorned" target="_blank" rel="noopener noreferrer" class="social-link-btn donate" title="Donate on Ko-fi">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+                    Donate
+                </a>
+            </div>
         </div>
     </div>
     <div id="beta-badge">Beta</div>
