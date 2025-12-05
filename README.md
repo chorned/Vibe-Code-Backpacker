@@ -1,5 +1,5 @@
 <div align="center">
-<img alt="Preview" src="https://github.com/chorned/Vibe-Code-Backpacker/blob/main/.github/preview_LLM.png" />
+<img alt="Preview" src="https://github.com/chorned/Vibe-Code-Backpacker/blob/main/.github/previewBackpacker1.png" />
 </div>
 
 # Welcome to Vibe Code Backpacker!
